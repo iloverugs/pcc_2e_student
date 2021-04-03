@@ -1,0 +1,5 @@
+So far I've learned the following things about Python:
+    I've learned about variables and simple data types.
+    I've learned about lists, tupes, and dictionaries.
+    I've learned about if statements, while loops, functions and classes.
+    Now I'm learning about how to open files in programs i write and close them.
