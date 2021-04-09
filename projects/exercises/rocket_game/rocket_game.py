@@ -3,9 +3,9 @@ import sys
 import pygame
 
 from settings import Settings
-from ship import Ship
+from rocket import Rocket
 
-class AlienInvasion:
+class RocketGame:
     """Overall class to manage game assets and behavior."""
 
     def __init__(self):
@@ -18,13 +18,13 @@ class AlienInvasion:
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("AlienInvasion")
 
-        self.ship = Ship(self)
+        self.rocket = Rocket(self)
 
     def run_game(self):
         """Start the main loop for the game."""
         while True:
             self._check_events()
-            self.ship.update()
+            self.rocket.update()
             self._update_screen()    
 
     def _check_events(self):
@@ -40,27 +40,35 @@ class AlienInvasion:
     def _check_keydown_events(self, event):
         """Respond to keypresses."""
         if event.key == pygame.K_RIGHT:
-            self.ship.moving_right = True
+            self.rocket.moving_right = True
         elif event.key == pygame.K_LEFT:
-            self.ship.moving_left = True
+            self.rocket.moving_left = True
+        elif event.key == pygame.K_UP:
+            self.rocket.moving_up = True
+        elif event.key == pygame.K_DOWN:
+            self.rocket.moving_down = True
         elif event.key == pygame.K_q:
             sys.exit()
 
     def _check_keyup_events(self, event):
         """Respond to key releases."""
         if event.key == pygame.K_RIGHT:
-            self.ship.moving_right = False
+            self.rocket.moving_right = False
         elif event.key == pygame.K_LEFT:
-            self.ship.moving_left = False
+            self.rocket.moving_left = False
+        elif event.key == pygame.K_UP:
+            self.rocket.moving_up = False
+        elif event.key == pygame.K_DOWN:
+            self.rocket.moving_down = False
 
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
         self.screen.fill(self.settings.bg_color)
-        self.ship.blitme()
+        self.rocket.blitme()
 
         pygame.display.flip()
 
 if __name__ == '__main__':
     #Make a game instance, and run the game.
-    ai = AlienInvasion()
-    ai.run_game()
+    rgame = RocketGame()
+    rgame.run_game()
