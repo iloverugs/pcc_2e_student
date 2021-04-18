@@ -62,8 +62,12 @@ class Raindrops:
         # Determine the number of rows of raindrops that fit on the screen.
         avail_space_y = self.rain_settings.screen_height - (2 * raindrop_height)
         number_raindrops_y = avail_space_y // (2 * raindrop_height)
-        return (avail_space_x, avail_space_y,
-                number_raindrops_x, number_raindrops_y)
+
+        return (
+            avail_space_x, avail_space_y,
+            number_raindrops_x, number_raindrops_y,
+            raindrop_width, raindrop_height
+        )
 
     def _create_rain(self):
         """Fill screen of raindrops."""
@@ -78,24 +82,17 @@ class Raindrops:
         """Create a raindrop and place it in the row."""
         raindrop = Raindrop(self)
         r_calc = self._calculate_spacing()
-        y_math_low = 2 * r_calc[1] * raindrop_y
-        y_math_high = r_calc[1] + 2 * r_calc[1] * raindrop_y
+        x_math_high = r_calc[4] + 2 * r_calc[4] * raindrop_x
+        y_math_low = 2 * raindrop.rect.height * raindrop_y
+        y_math_high = raindrop.rect.height \
+                      + 2 * raindrop.rect.height * raindrop_y
         overlap_chk = raindrop
         overlap_counter = 0
-        # Make sure raindrops don't overlap.
-        while overlap_chk is not None:
-            raindrop.x = randint(0, r_calc[0])
-            raindrop.y = y_math_high
-            raindrop.rect.x = raindrop.x
-            raindrop.rect.y = raindrop.y
-            overlap_chk = pygame.sprite.spritecollideany(
-                raindrop, self.rain, collided=None
-            )
-            if overlap_chk is not None or overlap_counter > 1000:
-                overlap_counter += 1
-                continue
-            else:
-                break
+
+        raindrop.x = x_math_high
+        raindrop.y = y_math_high
+        raindrop.rect.x = raindrop.x
+        raindrop.rect.y = raindrop.y
 
         self.rain.add(raindrop)
 
@@ -108,8 +105,7 @@ class Raindrops:
                 # Create new row of rain
                 r_calc = self._calculate_spacing()
                 for raindrop_x in range(r_calc[2]):
-                    self._create_raindrop(raindrop_x, 1)
-
+                    self._create_raindrop(raindrop_x, 0)
                 break
 
     def _update_screen(self):
