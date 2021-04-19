@@ -44,29 +44,22 @@ class Raindrops:
         if event.key == pygame.K_q:
             sys.exit()
 
-    def _update_rain(self):
-        """
-        Updates position of raindrops, and get rid of rain at the bottom.
-        """
-        self._check_bottom_edge()
-        self.rain.update()
-
     def _calculate_spacing(self):
         """Calculates the number of drops possible on the screen."""
         # Spacing between each raindrop is 1 drop width/height.
-        raindrop = Raindrop(self)
-        raindrop_width, raindrop_height = raindrop.rect.size
-        avail_space_x = self.rain_settings.screen_width - (2 * raindrop_width)
-        number_raindrops_x = avail_space_x // (2 * raindrop_width)
+        drop = Raindrop(self)
+        drop_width, drop_height = drop.rect.size
+        avail_space_x = self.rain_settings.screen_width - drop_width
+        number_raindrops_x = avail_space_x // (2 * drop_width)
 
         # Determine the number of rows of raindrops that fit on the screen.
-        avail_space_y = self.rain_settings.screen_height - (2 * raindrop_height)
-        number_raindrops_y = avail_space_y // (2 * raindrop_height)
+        avail_space_y = self.rain_settings.screen_height
+        number_raindrops_y = avail_space_y // (2 * drop_height)
 
         return (
             avail_space_x, avail_space_y,
             number_raindrops_x, number_raindrops_y,
-            raindrop_width, raindrop_height
+            drop_width, drop_height
         )
 
     def _create_rain(self):
@@ -74,39 +67,61 @@ class Raindrops:
         r_calc = self._calculate_spacing()
         # Create the full screen of raindrops.
         for raindrop_y in range(r_calc[3]):
-            print(raindrop_y)
-            for raindrop_x in range(r_calc[2]):
-                self._create_raindrop(raindrop_x, raindrop_y)
+            self._create_raindrops_y(raindrop_y)
+
+    def _create_raindrops_y(self, raindrop_y):
+        """Create a row of raindrops."""
+        r_calc = self._calculate_spacing()
+        for raindrop_x in range(r_calc[2]):
+            self._create_raindrop(raindrop_x, raindrop_y)
 
     def _create_raindrop(self, raindrop_x, raindrop_y):
         """Create a raindrop and place it in the row."""
         raindrop = Raindrop(self)
         r_calc = self._calculate_spacing()
-        x_math_high = r_calc[4] + 2 * r_calc[4] * raindrop_x
+        x_math = r_calc[4] + 2 * r_calc[4] * raindrop_x
+        x_math_high = x_math + raindrop_x // 2
+        x_math_low = x_math - raindrop_x // 2
         y_math_low = 2 * raindrop.rect.height * raindrop_y
-        y_math_high = raindrop.rect.height \
-                      + 2 * raindrop.rect.height * raindrop_y
+        y_math_high = 2 * raindrop.rect.height * raindrop_y
         overlap_chk = raindrop
         overlap_counter = 0
+        sprite_collision = pygame.sprite.spritecollideany(
+                            raindrop, self.rain, collided=None
+                            )
 
-        raindrop.x = x_math_high
-        raindrop.y = y_math_high
-        raindrop.rect.x = raindrop.x
-        raindrop.rect.y = raindrop.y
+        while overlap_chk is not None:
+            raindrop.x = x_math
+            raindrop.y = y_math_high
+            raindrop.rect.x = raindrop.x
+            raindrop.rect.y = raindrop.y
+            if sprite_collision is not None and overlap_counter < 30:
+                overlap_counter += 1
+                continue
+            else:
+                break
 
         self.rain.add(raindrop)
 
-    def _check_bottom_edge(self):
-        """Send raindrops from bttom edge to the top edge."""
-        for raindrop in self.rain.sprites():
-            if raindrop.check_bottom():
-                self.rain.remove(raindrop)
+    def _update_rain(self):
+        """
+        Updates position of raindrops, and get rid of rain at the bottom.
+        """
+        self.rain.update()
+        self._make_new_drops()
 
-                # Create new row of rain
-                r_calc = self._calculate_spacing()
-                for raindrop_x in range(r_calc[2]):
-                    self._create_raindrop(raindrop_x, 0)
-                break
+    def _make_new_drops(self):
+        """Send raindrops from bttom edge to the top edge."""
+        make_new_drops = False
+        for raindrop in self.rain.copy():
+            if raindrop.check_bottom():
+                # Remove this drop
+                self.rain.remove(raindrop)
+                make_new_drops = True
+
+        # Create new row of raindrops if needed.
+        if make_new_drops:
+            self._create_raindrops_y(0)
 
     def _update_screen(self):
         """Update images on teh screen, and flip to the new screen."""

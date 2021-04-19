@@ -19,15 +19,16 @@ class Raindrop(Sprite):
         self.rect.x = self.rect.width
         self.rect.y = self.rect.height
 
-        # Store the raindrop's exact position.
-        self.x = float(self.rect.x)
+        # Store the raindrop's exact vertical position.
+        # self.x = float(self.rect.x)
         self.y = float(self.rect.y)
 
     def check_bottom(self):
         """Return True if alien is at bottom of the screen."""
-        screen_rect = self.screen.get_rect()
-        if self.rect.bottom >= screen_rect.bottom:
+        if self.rect.top >= self.screen.get_rect().bottom:
             return True
+        else:
+            return False
 
     def update(self):
         """Move the raindrop down."""
