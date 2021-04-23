@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/pcc_2e_student.iml" filepath="$PROJECT_DIR$/.idea/pcc_2e_student.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../pcc_2e_projects/sideways_shooter/.idea/sideways_shooter.iml" filepath="$PROJECT_DIR$/../pcc_2e_projects/sideways_shooter/.idea/sideways_shooter.iml" />
     </modules>
   </component>
 </project>
